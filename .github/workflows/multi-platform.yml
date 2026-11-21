@@ -25,6 +25,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
 
+      - name: Apply port patches
+        shell: bash
+        run: python3 port.py || python port.py
+
       - name: Build
         uses: geode-sdk/build-geode-mod@main
         with:
