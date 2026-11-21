@@ -35,6 +35,19 @@ jobs:
           ccache-variant: ccache
           build-config: Release
 
+      - name: Collect all compile errors
+        if: failure() && runner.os == 'Linux'
+        run: |
+          cmake --build build -- -k 0 2>&1 | grep -E "error:" | sed 's#/home/runner/work/xdBot/xdBot/##' | sort -u | head -3000 > all-errors.txt || true
+          wc -l all-errors.txt
+
+      - name: Upload errors
+        if: failure() && runner.os == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-errors
+          path: all-errors.txt
+
   package:
     name: Package builds
     runs-on: ubuntu-latest
