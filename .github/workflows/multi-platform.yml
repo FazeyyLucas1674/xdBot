@@ -27,7 +27,7 @@ jobs:
 
       - name: Apply port patches
         shell: bash
-        run: python3 port.py || python port.py
+        run: for f in port*.py; do python3 "$f" || python "$f"; done
 
       - name: Build
         uses: geode-sdk/build-geode-mod@main
