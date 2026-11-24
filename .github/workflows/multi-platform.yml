@@ -34,7 +34,7 @@ jobs:
         with:
           export-pdb: true
           combine: true
-          sdk: "v6.0.0-beta.1"
+          sdk: "v6.0.0"
           target: ${{ matrix.config.target }}
           ccache-variant: ccache
           build-config: Release
@@ -51,6 +51,20 @@ jobs:
         with:
           name: all-errors
           path: all-errors.txt
+
+      - name: Collect all compile errors (Windows)
+        if: failure() && runner.os == 'Windows'
+        shell: bash
+        run: |
+          cmake --build build -- -k 0 2>&1 | grep -E "error C[0-9]+|error:|fatal error" | sed 's#\\#/#g' | sort -u | head -3000 > all-errors-windows.txt || true
+          wc -l all-errors-windows.txt
+
+      - name: Upload Windows errors
+        if: failure() && runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-errors-windows
+          path: all-errors-windows.txt
 
   package:
     name: Package builds
